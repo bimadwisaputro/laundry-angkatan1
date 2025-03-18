@@ -46,13 +46,16 @@
     $.each($(".sidebarleft"), function(index, value) {
         var id = $(this).attr('id');
         var parentid = $(this).attr('parentid');
-        // var id = href.split('.');
-        // console.log(id[0] + '==' + filename[0]);
         if (id == '<?= $_GET['page']; ?>') {
-            $("#" + id).addClass('active');
-            $("#" + parentid + "-nav").addClass('show');
-            $("#" + parentid + "").removeClass('collapsed');
+            if (parentid == '') {
+                $("#" + id).removeClass('collapsed');
+            } else {
+                $("#" + id).addClass('active');
+                $("#" + parentid + "-nav").addClass('show');
+                $("#" + parentid + "").removeClass('collapsed');
+            }
         }
+
     })
 
     setTimeout(function() {

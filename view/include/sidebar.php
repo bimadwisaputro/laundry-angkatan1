@@ -2,9 +2,16 @@
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-item">
-            <a class="nav-link collapsed sidebarleft" id="home" href="?page=dahsboard">
+            <a class="nav-link collapsed sidebarleft" id="dahsboard" parentid="" href="?page=dahsboard">
                 <i class="bi bi-grid"></i>
                 <span>Dashboard</span>
+            </a>
+        </li><!-- End Dashboard Nav -->
+        <li class="nav-heading">Shortcut</li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="?page=orders&form=add">
+                <i class="bi bi-basket2"></i>
+                <span>Form Add Orders</span>
             </a>
         </li><!-- End Dashboard Nav -->
 

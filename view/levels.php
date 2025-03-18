@@ -10,7 +10,7 @@ $numdata = mysqli_num_rows($getdata);
         <h1>Levels</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Masters</a></li>
                 <li class="breadcrumb-item active">Levels</li>
             </ol>
         </nav>

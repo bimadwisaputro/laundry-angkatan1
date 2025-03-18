@@ -1,17 +1,17 @@
 <?php
 $getdata = mysqli_query($conn, "SELECT *,case status when '1' then 'Active' else 'Not Active' end as statuslabel 
                                         ,case status when '1' then 'success' else 'danger' end as statuscolor 
-                                         from services where deleted_at is null order by id desc");
+                                         from tx_orders where deleted_at is null order by id desc");
 $numdata = mysqli_num_rows($getdata);
 
 ?>
 <main id="main" class="main">
     <div class="pagetitle">
-        <h1>Services</h1>
+        <h1>Orders</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-                <li class="breadcrumb-item active">Services</li>
+                <li class="breadcrumb-item"><a href="#">Transaction</a></li>
+                <li class="breadcrumb-item active">Orders</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -53,7 +53,7 @@ $numdata = mysqli_num_rows($getdata);
                                                 </td>
                                                 <td class="text-center" style="width:20%;">
                                                     <a href="<?= $links_path; ?>&form=edit&tid=<?= base64_encode($rows['id']); ?>" class="btn btn-primary"><i class="bi bi-pencil"></i></a>
-                                                    <a href="#" id="delete_<?= $rows['id']; ?>" tid="<?= $rows['id']; ?>" tipe="services" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                                                    <a href="#" id="delete_<?= $rows['id']; ?>" tid="<?= $rows['id']; ?>" tipe="orders" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -71,7 +71,7 @@ $numdata = mysqli_num_rows($getdata);
                                 $label = 'Edit';
                                 $labelbutton = 'Update';
                                 $tid = base64_decode($_GET['tid']);
-                                $getdata = mysqli_query($conn, "SELECT * from services where id = '$tid'");
+                                $getdata = mysqli_query($conn, "SELECT * from orders where id = '$tid'");
                                 $rows = mysqli_fetch_assoc($getdata);
                                 $name = $rows['name'];
                                 $price = $rows['price'];
@@ -87,30 +87,30 @@ $numdata = mysqli_num_rows($getdata);
                                 $status = 0;
                             }
                         ?>
-                            <input type="hidden" id="tid" name="tid" class="servicesform" value="<?= $tid; ?>">
-                            <h5 class="card-title"><?= $label; ?> Form</h5>
+                            <input type="hidden" id="tid" name="tid" class="ordersform" value="<?= $tid; ?>">
+                            <h5 class="card-title"><?= $label; ?> Orders Form</h5>
                             <div class="row g-3">
                                 <div class="col-md-12 mb-2">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control servicesform" name="name" id="name" value="<?= $name; ?>" placeholder="Name" required>
+                                        <input type="text" class="form-control ordersform" name="name" id="name" value="<?= $name; ?>" placeholder="Name" required>
                                         <label for="name">Name</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12 mb-2">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control servicesform" name="price" id="price" value="<?= $price; ?>" placeholder="Price" required>
+                                        <input type="text" class="form-control ordersform" name="price" id="price" value="<?= $price; ?>" placeholder="Price" required>
                                         <label for="name">Price</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12 mb-2">
                                     <div class="form-floating">
-                                        <textarea type="text" class="form-control servicesform" name="description" id="description" placeholder="Description"><?= $description; ?></textarea>
+                                        <textarea type="text" class="form-control ordersform" name="description" id="description" placeholder="Description"><?= $description; ?></textarea>
                                         <label for="name">Description</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-2">
-                                        <select class="form-select servicesform" id="status" aria-label="Status">
+                                        <select class="form-select ordersform" id="status" aria-label="Status">
                                             <option value="1" <?php if ($status == 1) echo 'selected'; ?>>Active</option>
                                             <option value="0" <?php if ($status == 0) echo 'selected'; ?>>Non Active</option>
                                         </select>
