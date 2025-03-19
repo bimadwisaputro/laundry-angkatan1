@@ -6,7 +6,6 @@ if (isset($_POST)) {
     $mode = $_POST['mode'];
     $tipe = $_POST['tipe'];
     if ($mode == 'Add') {
-
         $field = '';
         $isi = '';
         $no = 1;
