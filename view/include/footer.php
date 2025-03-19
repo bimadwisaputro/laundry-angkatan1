@@ -104,6 +104,29 @@
 
 
     <?php if ($_GET['page'] == 'orders' && isset($_GET['form'])) { ?>
+
+        function removesdetail(counter) {
+            $("#sub_row" + counter).remove();
+            setTimeout(function() {
+                var pay = $("#pay").val();
+                grand_total = 0;
+                changes = 0;
+                $('[name="subtotal[]"]').each(function() {
+                    var total = $(this).val();
+                    if (total != '' && parseInt(total) > 0)
+                        grand_total += parseInt(total);
+                });
+
+                if (grand_total > 0) {
+                    // console.log(parseInt(pay) + ' - ' + parseInt(grand_total));
+                    // return false;
+                    changes = parseInt(pay) - parseInt(grand_total);
+                    $('#changes').val(changes);
+                    $("#total").val(grand_total);
+                }
+            }, 1000);
+
+        }
         //require(['input-mask']);
         $(document).ready(function() {
             var item_counter = <?php echo $item_counter; ?>;
@@ -154,7 +177,7 @@
                     </div>
                 </td> 
                 <td class="pr-0" class="align-middle">
-                    <a href="#" class="icon fe-md" onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); return false;">
+                    <a href="#" class="icon fe-md" onclick="removesdetail(${item_counter})">
                         <i class="bi bi-x-square "></i>
                     </a>
                 </td>

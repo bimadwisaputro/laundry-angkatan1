@@ -54,18 +54,20 @@ $(document).on("click", "[id^=simpandetail_]", function (e) {
     dataMap["" + idx + ""] = "" + value + "";
   });
 
-  counter = 0;
+  mapnum = 0;
   mapping = [[]];
   $('[name="services_id[]"]').each(function () {
+    counter = $(this).attr("counter");
     dataDetail = {};
+    // dataDetail["counter"] = counter;
     $.each($("." + tipe + "formdetail" + counter), function (index, value) {
       var idx = $(this).attr("id");
       // alert(idx);
       var valueisi = $("#" + idx + "").val();
       dataDetail["" + idx + ""] = "" + valueisi + "";
     });
-    mapping[counter] = [dataDetail];
-    counter++;
+    mapping[mapnum] = [counter, dataDetail];
+    mapnum++;
   });
   var lempardata = JSON.stringify(mapping);
   // console.log(lempardata);

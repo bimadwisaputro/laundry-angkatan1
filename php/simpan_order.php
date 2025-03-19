@@ -74,21 +74,24 @@ if (isset($_POST)) {
                 $isi2[$noc] = '';
                 // mysqli_close($conn);
                 $no = 1;
-                foreach ($rows[0] as $index => $row) {
-                    if (str_replace('' . $indexname . '', '', $index) == 'services_id') {
-                        $res = explode("-", $row);
-                        $row = $res[0];
-                    }
+                foreach ($rows[1] as $index => $row) {
+                    if (!in_array($index, ['counter'])) {
+                        //
+                        if (str_replace('' . $rows[0] . '', '', $index) == 'services_id') {
+                            $res = explode("-", $row);
+                            $row = $res[0];
+                        }
 
-                    if ($no == 1) {
-                        $field2[$noc] .= "`" . str_replace('' . $indexname . '', '', $index) . "`";
-                        $isi2[$noc] .= "'" . $row . "'";
-                    } else {
-                        // die($rows);
-                        $field2[$noc] .= ",`" . str_replace('' . $indexname . '', '', $index) . "`";
-                        $isi2[$noc] .= ",'" . $row . "'";
+                        if ($no == 1) {
+                            $field2[$noc] .= "`" . str_replace('' . $rows[0] . '', '', $index) . "`";
+                            $isi2[$noc] .= "'" . $row . "'";
+                        } else {
+                            // die($rows);
+                            $field2[$noc] .= ",`" . str_replace('' . $rows[0] . '', '', $index) . "`";
+                            $isi2[$noc] .= ",'" . $row . "'";
+                        }
+                        $no++;
                     }
-                    $no++;
                 }
 
                 // $valuesins  .= "('" . $last_id . "'," . $isi2[$noc] . ") ";

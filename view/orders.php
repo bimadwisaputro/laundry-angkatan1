@@ -104,17 +104,39 @@ $numdata = mysqli_num_rows($getdata);
                     $total = $rows['total'];
                     $status = $rows['status'];
                 } else {
+                    $getdata = mysqli_query($conn, "SELECT max(right(code,4)) + 1 as nextnumber from tx_orders where left(code,8) = '" . date('dmY') . "' ");
+                    $checknum = mysqli_num_rows($getdata);
+                    if ($checknum > 0) {
+                        $rows = mysqli_fetch_assoc($getdata);
+                        if ($rows['nextnumber'] != null) {
+                            if (strlen($rows['nextnumber']) == 4) {
+                                $nextnum = $rows['nextnumber'];
+                            } else if (strlen($rows['nextnumber']) == 3) {
+                                $nextnum = '0' . $rows['nextnumber'];
+                            } else if (strlen($rows['nextnumber']) == 2) {
+                                $nextnum = '00' . $rows['nextnumber'];
+                            } else if (strlen($rows['nextnumber']) == 1) {
+                                $nextnum = '000' . $rows['nextnumber'];
+                            }
+                        } else {
+                            $nextnum = '0001';
+                        }
+                    } else {
+                        $nextnum = '0001';
+                    }
+                    $code = date('dmY') . $nextnum;
                     $label = 'Add';
                     $labelbutton = 'Save';
                     $tid = 0;
                     $customers_id = 0;
-                    $code = date('dmY') . '0001';
+
                     $date = date('Y-m-d');
                     $end_date = date('Y-m-d');
                     $pay = '';
                     $changes = '';
                     $total = '';
                     $status = 0;
+                    $checkdetail = 0;
                 }
             ?>
                 <style>
@@ -216,10 +238,7 @@ $numdata = mysqli_num_rows($getdata);
                                     <?php
                                     $item_counter = 0;
                                     $grand_total = 0;
-
                                     ?>
-
-
                                     <tbody id="t">
                                         <?php if ($checkdetail > 0) { ?>
                                             <?php foreach ($rowsdetail as $rowd) { ?>
@@ -249,7 +268,7 @@ $numdata = mysqli_num_rows($getdata);
                                                         </div>
                                                     </td>
                                                     <td class="pr-0" class="align-middle">
-                                                        <a href="#" class="icon fe-md" onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); return false;">
+                                                        <a href="#" class="icon fe-md" onclick="removesdetail(<?php echo $item_counter; ?>)">
                                                             <i class="bi bi-x-square "></i>
                                                         </a>
                                                     </td>
@@ -283,7 +302,7 @@ $numdata = mysqli_num_rows($getdata);
                                                     </div>
                                                 </td>
                                                 <td class="pr-0" class="align-middle">
-                                                    <a href="#" class="icon fe-md" onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); return false;">
+                                                    <a href="#" class="icon fe-md" onclick="removesdetail(<?php echo $item_counter; ?>)">
                                                         <i class="bi bi-x-square "></i>
                                                     </a>
                                                 </td>
