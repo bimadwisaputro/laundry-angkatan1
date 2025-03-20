@@ -1,3 +1,86 @@
+<?php
+
+function gettotal($total, $totalcompare, $tipe)
+{
+    $checkorder = $total - $totalcompare;
+    if ($checkorder < 0) {
+        $selisihorder = $checkorder * -1;
+        if ($tipe == 'orders') {
+            $return['label'] = "decrease";
+        } else if ($tipe == 'pickups') {
+            $return['label'] = "decrease";
+        } else if ($tipe == 'customers') {
+            $return['label'] = "active";
+        }
+        $return['color'] = "danger";
+    } else {
+        $selisihorder = $checkorder;
+        if ($tipe == 'orders') {
+            $return['label'] = "increase";
+        } else if ($tipe == 'pickups') {
+            $return['label'] = "increase";
+        } else if ($tipe == 'customers') {
+            $return['label'] = "active";
+        }
+        $return['color'] = "success";
+    }
+    $return['percent'] = (($selisihorder) / $total) * 100;
+    return $return;
+}
+function getdetailorder($id, $conn)
+{
+    $getdata = mysqli_query($conn, "SELECT  a.*,b.name sername
+                                    FROM tx_orders_d a 
+                                    left join services b on a.services_id=b.id 
+                                             where orders_id='" . $id . "'
+                            ");
+    $numdata = mysqli_num_rows($getdata);
+    $rows = mysqli_fetch_all($getdata, MYSQLI_ASSOC);
+    return $rows;
+}
+$getdata = mysqli_query($conn, " SELECT 
+                                (SELECT count(*) from tx_orders where date(created_at) = curdate() and deleted_at is null) as totalorders,
+                                (SELECT count(*) from tx_orders where date(created_at) = SUBDATE(CURDATE(), INTERVAL 1 DAY) and deleted_at is null) as totalorderstomorow,
+                                (SELECT sum(total) from tx_orders where date(created_at) = curdate() and deleted_at is null) as totalearns,
+                                (SELECT sum(total) from tx_orders where date(created_at) = SUBDATE(CURDATE(), INTERVAL 1 DAY) and deleted_at is null) as totalearnstomorow,
+                                (SELECT count(*) from customers where  deleted_at is null) as totalcustomers,
+                                (SELECT count(*) from customers where  status='0' and deleted_at is null) as totalcustomersnotactive 
+                                
+                        ");
+$numdata = mysqli_num_rows($getdata);
+$rows = mysqli_fetch_all($getdata, MYSQLI_ASSOC);
+
+$getdata_last10order = mysqli_query($conn, "SELECT  a.*,b.name cusname,DATE_FORMAT(a.created_at, '%H:%i:%s') timeorder
+                                             FROM tx_orders a 
+                                             left join customers b on a.customers_id=b.id 
+                                             where date(a.created_at) = curdate() and a.deleted_at is null 
+                                             order by a.id desc limit 10");
+$numdata_last10order = mysqli_num_rows($getdata_last10order);
+$rows_last10order = mysqli_fetch_all($getdata_last10order, MYSQLI_ASSOC);
+
+
+$getdata_last10pickup = mysqli_query($conn, "SELECT  a.*,b.name cusname,DATE_FORMAT(a.created_at, '%H:%i') timepickup
+                                             FROM tx_pickups a 
+                                             left join customers b on a.customers_id=b.id 
+                                             where date(a.created_at) = curdate() and a.deleted_at is null 
+                                             order by a.id desc limit 10");
+$numdata_last10pickup = mysqli_num_rows($getdata_last10pickup);
+$rows_last10pickup = mysqli_fetch_all($getdata_last10pickup, MYSQLI_ASSOC);
+
+$getdata_top5service = mysqli_query($conn, "SELECT  a.*,(a.price * b.totalqty ) total ,b.totalsell,b.totalqty
+                                             FROM services a 
+                                             left join 
+                                             (
+                                                select count(id) totalsell,sum(qty) totalqty,services_id 
+                                                from tx_orders_d 
+                                                where date(created_at) = curdate() and deleted_at is null group by services_id 
+                                              )
+                                              b on b.services_id=a.id  
+                                             where a.deleted_at is null 
+                                             order by (a.price * b.totalqty ) desc limit 5");
+$numdata_top5service = mysqli_num_rows($getdata_top5service);
+$rows_top5service = mysqli_fetch_all($getdata_top5service, MYSQLI_ASSOC);
+?>
 <main id="main" class="main">
     <div class="pagetitle">
         <h1>Dashboard</h1>
@@ -36,9 +119,8 @@
                                         <i class="bi bi-cart"></i>
                                     </div>
                                     <div class="ps-3">
-                                        <h6>145</h6>
-                                        <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
+                                        <h6><?= $rows[0]['totalorders']; ?></h6>
+                                        <span class="text-<?= gettotal($rows[0]['totalorders'], $rows[0]['totalorderstomorow'], 'orders')['color']; ?> small pt-1 fw-bold"><?= gettotal($rows[0]['totalorders'], $rows[0]['totalorderstomorow'], 'orders')['percent']; ?>%</span> <span class="text-muted small pt-2 ps-1"><?= gettotal($rows[0]['totalorders'], $rows[0]['totalorderstomorow'], 'orders')['label']; ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -59,14 +141,14 @@
                                 </ul>
                             </div>
                             <div class="card-body">
-                                <h5 class="card-title">Pickups <span>| Today</span></h5>
+                                <h5 class="card-title">Revenue <span>| Today</span></h5>
                                 <div class="d-flex align-items-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                         <i class="bi bi-currency-dollar"></i>
                                     </div>
                                     <div class="ps-3">
-                                        <h6>$3,264</h6>
-                                        <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
+                                        <h6><?= number_format($rows[0]['totalearns']); ?></h6>
+                                        <span class="text-<?= gettotal($rows[0]['totalearns'], $rows[0]['totalearnstomorow'], 'pickups')['color']; ?> small pt-1 fw-bold"><?= gettotal($rows[0]['totalearns'], $rows[0]['totalearnstomorow'], 'pickups')['percent']; ?>%</span> <span class="text-muted small pt-2 ps-1"><?= gettotal($rows[0]['totalearns'], $rows[0]['totalearnstomorow'], 'pickups')['label']; ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -93,8 +175,8 @@
                                         <i class="bi bi-people"></i>
                                     </div>
                                     <div class="ps-3">
-                                        <h6>1244</h6>
-                                        <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
+                                        <h6><?= $rows[0]['totalcustomers']; ?></h6>
+                                        <span class="text-<?= gettotal($rows[0]['totalcustomers'], $rows[0]['totalcustomersnotactive'], 'customers')['color']; ?> small pt-1 fw-bold"><?= gettotal($rows[0]['totalcustomers'], $rows[0]['totalcustomersnotactive'], 'customers')['percent']; ?>%</span> <span class="text-muted small pt-2 ps-1"><?= gettotal($rows[0]['totalcustomers'], $rows[0]['totalcustomersnotactive'], 'customers')['label']; ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -123,126 +205,42 @@
                                             <th scope="col">Customer</th>
                                             <th scope="col">Service</th>
                                             <th scope="col">Price</th>
+                                            <th scope="col">Time Order</th>
                                             <th scope="col">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2457</a></th>
-                                            <td>Brandon Jacob</td>
-                                            <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                                            <td>$64</td>
-                                            <td><span class="badge bg-success">Approved</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2147</a></th>
-                                            <td>Bridie Kessler</td>
-                                            <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                                            <td>$47</td>
-                                            <td><span class="badge bg-warning">Pending</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2049</a></th>
-                                            <td>Ashleigh Langosh</td>
-                                            <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                                            <td>$147</td>
-                                            <td><span class="badge bg-success">Approved</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2644</a></th>
-                                            <td>Angus Grady</td>
-                                            <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                                            <td>$67</td>
-                                            <td><span class="badge bg-danger">Rejected</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2644</a></th>
-                                            <td>Raheem Lehner</td>
-                                            <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                                            <td>$165</td>
-                                            <td><span class="badge bg-success">Approved</span></td>
-                                        </tr>
+                                        <?php
+                                        $n = 1;
+                                        foreach ($rows_last10order as $row10order) { ?>
+                                            <tr>
+                                                <th scope="row"><a href="#">#<?= $n++; ?></a></th>
+                                                <td><?= $row10order['cusname']; ?></td>
+                                                <td>
+                                                    <?php
+                                                    foreach (getdetailorder($row10order['id'], $conn) as $rowd) {
+                                                    ?>
+                                                        <span class="badge bg-primary"><?= $rowd['sername']; ?></span>
+                                                    <?php } ?>
+                                                </td>
+                                                <td>Rp. <?= number_format($row10order['total']); ?></td>
+                                                <td><?= $row10order['timeorder']; ?></td>
+                                                <td>
+                                                    <?php if ($row10order['status'] > 0) { ?>
+                                                        <span class="badge bg-success">Pickup</span>
+                                                    <?php } else { ?>
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    <?php } ?>
+                                                </td>
+                                            </tr>
+                                        <?php } ?>
+
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div><!-- End Recent Sales -->
 
-                    <!-- Reports -->
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="filter">
-                                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                        <h6>Filter</h6>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Today</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Report Orders <span>/ Today</span></h5>
-                                <!-- Line Chart -->
-                                <div id="reportsChart"></div>
-                                <script>
-                                    document.addEventListener("DOMContentLoaded", () => {
-                                        new ApexCharts(document.querySelector("#reportsChart"), {
-                                            series: [{
-                                                name: 'Sales',
-                                                data: [31, 40, 28, 51, 42, 82, 56],
-                                            }, {
-                                                name: 'Revenue',
-                                                data: [11, 32, 45, 32, 34, 52, 41]
-                                            }, {
-                                                name: 'Customers',
-                                                data: [15, 11, 32, 18, 9, 24, 11]
-                                            }],
-                                            chart: {
-                                                height: 350,
-                                                type: 'area',
-                                                toolbar: {
-                                                    show: false
-                                                },
-                                            },
-                                            markers: {
-                                                size: 4
-                                            },
-                                            colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                                            fill: {
-                                                type: "gradient",
-                                                gradient: {
-                                                    shadeIntensity: 1,
-                                                    opacityFrom: 0.3,
-                                                    opacityTo: 0.4,
-                                                    stops: [0, 90, 100]
-                                                }
-                                            },
-                                            dataLabels: {
-                                                enabled: false
-                                            },
-                                            stroke: {
-                                                curve: 'smooth',
-                                                width: 2
-                                            },
-                                            xaxis: {
-                                                type: 'datetime',
-                                                categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-                                            },
-                                            tooltip: {
-                                                x: {
-                                                    format: 'dd/MM/yy HH:mm'
-                                                },
-                                            }
-                                        }).render();
-                                    });
-                                </script>
-                                <!-- End Line Chart -->
-                            </div>
-                        </div>
-                    </div><!-- End Reports -->
                     <!-- Top Selling -->
                 </div>
             </div><!-- End Left side columns -->
@@ -266,48 +264,17 @@
                     <div class="card-body">
                         <h5 class="card-title">Last 10 Pickups <span>| Today</span></h5>
                         <div class="activity">
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">32 min</div>
-                                <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                                <div class="activity-content">
-                                    Quia quae rerum <a href="#" class="fw-bold text-dark">explicabo officiis</a> beatae
-                                </div>
-                            </div><!-- End activity item-->
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">56 min</div>
-                                <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
-                                <div class="activity-content">
-                                    Voluptatem blanditiis blanditiis eveniet
-                                </div>
-                            </div><!-- End activity item-->
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">2 hrs</div>
-                                <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
-                                <div class="activity-content">
-                                    Voluptates corrupti molestias voluptatem
-                                </div>
-                            </div><!-- End activity item-->
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">1 day</div>
-                                <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
-                                <div class="activity-content">
-                                    Tempore autem saepe <a href="#" class="fw-bold text-dark">occaecati voluptatem</a> tempore
-                                </div>
-                            </div><!-- End activity item-->
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">2 days</div>
-                                <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                                <div class="activity-content">
-                                    Est sit eum reiciendis exercitationem
-                                </div>
-                            </div><!-- End activity item-->
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">4 weeks</div>
-                                <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                                <div class="activity-content">
-                                    Dicta dolorem harum nulla eius. Ut quidem quidem sit quas
-                                </div>
-                            </div><!-- End activity item-->
+                            <?php
+                            $n = 1;
+                            foreach ($rows_last10pickup as $row10pickup) { ?>
+                                <div class="activity-item d-flex">
+                                    <div class="activite-label fw-bold"><?= $row10pickup['timepickup']; ?></div>
+                                    <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                                    <div class="activity-content ">
+                                        <span class="fw-bold text-primary"><?= $row10pickup['cusname']; ?></span> - note : <?= $row10pickup['notes']; ?>
+                                    </div>
+                                </div><!-- End activity item-->
+                            <?php } ?>
                         </div>
                     </div>
                 </div><!-- End Recent Activity -->
@@ -331,49 +298,23 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Preview</th>
-                                        <th scope="col">Product</th>
+                                        <th scope="col">Service</th>
                                         <th scope="col">Price</th>
                                         <th scope="col">Sold</th>
                                         <th scope="col">Revenue</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <th scope="row"><a href="#"><img src="assets/adminlte/assets/img/product-1.jpg" alt=""></a></th>
-                                        <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                                        <td>$64</td>
-                                        <td class="fw-bold">124</td>
-                                        <td>$5,828</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"><a href="#"><img src="assets/adminlte/assets/img/product-2.jpg" alt=""></a></th>
-                                        <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                                        <td>$46</td>
-                                        <td class="fw-bold">98</td>
-                                        <td>$4,508</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"><a href="#"><img src="assets/adminlte/assets/img/product-3.jpg" alt=""></a></th>
-                                        <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                                        <td>$59</td>
-                                        <td class="fw-bold">74</td>
-                                        <td>$4,366</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"><a href="#"><img src="assets/adminlte/assets/img/product-4.jpg" alt=""></a></th>
-                                        <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                                        <td>$32</td>
-                                        <td class="fw-bold">63</td>
-                                        <td>$2,016</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"><a href="#"><img src="assets/adminlte/assets/img/product-5.jpg" alt=""></a></th>
-                                        <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                                        <td>$79</td>
-                                        <td class="fw-bold">41</td>
-                                        <td>$3,239</td>
-                                    </tr>
+                                    <?php
+                                    $n = 1;
+                                    foreach ($rows_top5service as $rowtop5service) { ?>
+                                        <tr>
+                                            <td><a href="#" class="text-primary fw-bold"><?= $rowtop5service['name']; ?></a></td>
+                                            <td>Rp. <?= number_format($rowtop5service['price']); ?></td>
+                                            <td class="fw-bold"><?= number_format($rowtop5service['totalsell']); ?> Times</td>
+                                            <td>Rp. <?= number_format($rowtop5service['total']); ?></td>
+                                        </tr>
+                                    <?php } ?>
                                 </tbody>
                             </table>
                         </div>

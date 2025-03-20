@@ -5,8 +5,11 @@ if (!isset($_SESSION['userid'])) {
     header('location:php/logout.php');
     exit;
 }
+$links_path = "";
+$getpage = "";
 if (isset($_GET['page'])) {
     $links_path = "home.php?page=" . $_GET['page'] . "";
+    $getpage = $_GET['page'];
 }
 ?>
 <!DOCTYPE html>

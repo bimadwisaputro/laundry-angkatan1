@@ -4,9 +4,12 @@ include('connect.php');
 
 if (isset($_POST)) {
     $mode = $_POST['mode'];
-    $tipe = $_POST['tipe'];
+    if (in_array($_POST['tipe'], ['pickups'])) { //for transaction table
+        $tipe = 'tx_' . $_POST['tipe'];
+    } else {
+        $tipe = $_POST['tipe'];
+    }
     if ($mode == 'Add') {
-
         $field = '';
         $isi = '';
         $no = 1;
@@ -55,6 +58,10 @@ if (isset($_POST)) {
 
 
     if ($runsql) {
+        if ($_POST['tipe'] == 'pickups' && $mode == 'Add') {
+            $oderupdate = mysqli_query($conn, "UPDATE tx_orders  SET status='1'  WHERE id='" . $_POST['orders_id'] . "'");
+            $oderdetailupdate = mysqli_query($conn, "UPDATE tx_orders_d  SET status='1'  WHERE orders_id='" . $_POST['orders_id'] . "'");
+        }
         $json['status'] = 1;
     } else {
         $json['status'] = 0;

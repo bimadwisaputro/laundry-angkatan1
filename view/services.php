@@ -46,7 +46,7 @@ $numdata = mysqli_num_rows($getdata);
                                             <tr>
                                                 <td><?= $i++; ?></td>
                                                 <td><?= $rows['name']; ?></td>
-                                                <td><?= $rows['price']; ?></td>
+                                                <td><?= number_format($rows['price']); ?></td>
                                                 <td><?= $rows['description']; ?></td>
                                                 <td class="text-center">
                                                     <span class="badge bg-<?= $rows['statuscolor']; ?>"><?= $rows['statuslabel']; ?></span>

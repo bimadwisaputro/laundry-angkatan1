@@ -70,13 +70,8 @@
             </a>
             <ul id="reports-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                 <li>
-                    <a href="?page=orders_report" id="orders_report" parentid="reports" class="sidebarleft">
+                    <a href="?page=allreports" id="allreports" parentid="reports" class="sidebarleft">
                         <i class="bi bi-play-fill"></i><span>Order Reports</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="?page=pickup_report" id="pickup_report" parentid="reports" class="sidebarleft">
-                        <i class="bi bi-play-fill"></i><span>Pickup Report</span>
                     </a>
                 </li>
             </ul>

@@ -8,6 +8,8 @@ if (isset($_GET['page'])) {
     } else {
         include('view/dashboard.php');
     }
+} else {
+    include('view/dashboard.php');
 }
 ?>
 
