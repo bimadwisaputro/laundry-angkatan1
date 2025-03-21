@@ -5,14 +5,25 @@ function gettotal($total, $totalcompare, $tipe)
     $checkorder = $total - $totalcompare;
     if ($checkorder < 0) {
         $selisihorder = $checkorder * -1;
-        if ($tipe == 'orders') {
-            $return['label'] = "decrease";
-        } else if ($tipe == 'pickups') {
-            $return['label'] = "decrease";
-        } else if ($tipe == 'customers') {
-            $return['label'] = "active";
+        if ($total == 0) {
+            if ($tipe == 'orders') {
+                $return['label'] = "-";
+            } else if ($tipe == 'pickups') {
+                $return['label'] = "-";
+            } else if ($tipe == 'customers') {
+                $return['label'] = "active";
+            }
+            $return['color'] = "success";
+        } else {
+            if ($tipe == 'orders') {
+                $return['label'] = "decrease";
+            } else if ($tipe == 'pickups') {
+                $return['label'] = "decrease";
+            } else if ($tipe == 'customers') {
+                $return['label'] = "active";
+            }
+            $return['color'] = "danger";
         }
-        $return['color'] = "danger";
     } else {
         $selisihorder = $checkorder;
         if ($tipe == 'orders') {
@@ -24,25 +35,38 @@ function gettotal($total, $totalcompare, $tipe)
         }
         $return['color'] = "success";
     }
-    $return['percent'] = (($selisihorder) / $total) * 100;
+    if ($total == 0) {
+        $return['percent'] = 0;
+    } else {
+        $val = ((($selisihorder) / $total) * 100);
+        if (is_numeric($val) && floor($val) != $val) {
+            $return['percent'] = number_format($val, 2, '.', '');
+        } else {
+            $return['percent'] =  $val;
+        }
+    }
+    //die('((' . $selisihorder . ') / ' . $total . ') * 100');
     return $return;
 }
+
+
 function getdetailorder($id, $conn)
 {
     $getdata = mysqli_query($conn, "SELECT  a.*,b.name sername
                                     FROM tx_orders_d a 
                                     left join services b on a.services_id=b.id 
-                                             where orders_id='" . $id . "'
+                                    where orders_id='" . $id . "'
                             ");
     $numdata = mysqli_num_rows($getdata);
     $rows = mysqli_fetch_all($getdata, MYSQLI_ASSOC);
     return $rows;
 }
+
 $getdata = mysqli_query($conn, " SELECT 
                                 (SELECT count(*) from tx_orders where date(created_at) = curdate() and deleted_at is null) as totalorders,
                                 (SELECT count(*) from tx_orders where date(created_at) = SUBDATE(CURDATE(), INTERVAL 1 DAY) and deleted_at is null) as totalorderstomorow,
-                                (SELECT sum(total) from tx_orders where date(created_at) = curdate() and deleted_at is null) as totalearns,
-                                (SELECT sum(total) from tx_orders where date(created_at) = SUBDATE(CURDATE(), INTERVAL 1 DAY) and deleted_at is null) as totalearnstomorow,
+                                (SELECT ifnull(sum(total),0) from tx_orders where date(created_at) = curdate() and deleted_at is null) as totalearns,
+                                (SELECT ifnull(sum(total),0) from tx_orders where date(created_at) = SUBDATE(CURDATE(), INTERVAL 1 DAY) and deleted_at is null) as totalearnstomorow,
                                 (SELECT count(*) from customers where  deleted_at is null) as totalcustomers,
                                 (SELECT count(*) from customers where  status='0' and deleted_at is null) as totalcustomersnotactive 
                                 

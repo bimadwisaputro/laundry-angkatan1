@@ -1,6 +1,6 @@
  <?php
     if (isset($_POST)) {
-        if ($_POST['reporttype'] != '') {
+        if (isset($_POST['reporttype']) && $_POST['reporttype'] != '') {
             $reporttype = $_POST['reporttype'];
             $datefrom = $_POST['datefrom'];
             $dateto = $_POST['dateto'];
@@ -11,7 +11,7 @@
                                         ,DATE_FORMAT(a.end_date, '%W , %d %M %Y') end_dates 
                                          from tx_orders a 
                                          left join customers b on a.customers_id=b.id 
-                                         where a.deleted_at is null 
+                                         where a.deleted_at is null and date(a.created_at) >= '" . $datefrom . "' and date(a.created_at) <= '" . $dateto . "'
                                          order by a.id desc");
             } else if ($reporttype == '2') { //Services
                 $getdata = mysqli_query($conn, "SELECT  a.*,(a.price * b.totalqty ) total ,b.totalsell,b.totalqty
@@ -20,7 +20,7 @@
                                              (
                                                 select count(id) totalsell,sum(qty) totalqty,services_id 
                                                 from tx_orders_d 
-                                                where date(created_at) = curdate() and deleted_at is null group by services_id 
+                                                where deleted_at is null and date(created_at) >= '" . $datefrom . "' and date(created_at) <= '" . $dateto . "' group by services_id 
                                               )
                                               b on b.services_id=a.id  
                                              where a.deleted_at is null 
@@ -32,7 +32,7 @@
                                              (
                                                 select count(id) totalorder,sum(total) total,customers_id 
                                                 from tx_orders
-                                                where date(created_at) = curdate() and deleted_at is null group by customers_id 
+                                                where deleted_at is null and date(created_at) >= '" . $datefrom . "' and date(created_at) <= '" . $dateto . "' group by customers_id 
                                               )
                                               b on b.customers_id=a.id  
                                              where a.deleted_at is null 
@@ -45,7 +45,7 @@
                                          from tx_pickups a 
                                          left join customers b on a.customers_id=b.id 
                                          left join tx_orders c on a.orders_id=c.id 
-                                         where a.deleted_at is null 
+                                         where a.deleted_at is null and date(a.created_at) >= '" . $datefrom . "' and date(a.created_at) <= '" . $dateto . "'
                                          order by a.id desc  ");
             }
 
@@ -98,7 +98,8 @@
                          <h5 class="card-title">Filters</h5>
                          <form action="" method="post">
                              <div class="row mb-4">
-                                 <div class="col-4">
+                                 <div class="col-5">
+                                     <label for="reporttype">Report Type</label>
                                      <select name="reporttype" class="form-control" id="reporttype">
                                          <option value="">Choose Report Type</option>
                                          <option value="1" <?php if ($reporttype == '1') echo 'selected'; ?>>Orders Report</option>
@@ -108,12 +109,15 @@
                                      </select>
                                  </div>
                                  <div class="col-3">
+                                     <label for="datefrom">Date From</label>
                                      <input type="date" class="form-control" value="<?= $datefrom; ?>" name="datefrom" id="datefrom">
                                  </div>
                                  <div class="col-3">
+                                     <label for="datefrom">Date To</label>
                                      <input type="date" class="form-control" value="<?= $dateto; ?>" name="dateto" id="dateto">
                                  </div>
-                                 <div class="col-2">
+                                 <div class="col-1">
+                                     <br>
                                      <button type="submit" class="btn btn-primary" id="submitreport" name="submitreport"> <i class="bi bi-search"></i> Search</button>
                                  </div>
                              </div>
@@ -126,7 +130,7 @@
                              <h5 class="card-title">View Reports</h5>
                              <?php
                                 if (isset($_POST)) {
-                                    if ($_POST['reporttype'] != '') {
+                                    if (isset($_POST['reporttype']) && $_POST['reporttype'] != '') {
                                 ?>
                                      <table class="table table-borderless datatable">
                                          <?php
