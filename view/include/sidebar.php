@@ -15,7 +15,7 @@
             </a>
         </li><!-- End Dashboard Nav -->
 
-        <li class="nav-heading">Master</li>
+        <li class="nav-heading">Masters</li>
         <li class="nav-item">
             <a class="nav-link collapsed" id="masters" data-bs-target="#masters-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-folder"></i><span>Masters</span><i class="bi bi-chevron-down ms-auto"></i>

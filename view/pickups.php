@@ -2,7 +2,7 @@
 $getdata = mysqli_query($conn, "SELECT c.*,b.name customername,DATE_FORMAT(c.date, '%W , %d %M %Y') dates
                                         ,DATE_FORMAT(a.date, '%W , %d %M %Y') pickupdate
                                         ,DATE_FORMAT(c.end_date, '%W , %d %M %Y') end_dates 
-                                        ,a.notes pickupnote ,a.date pickdate
+                                        ,a.notes pickupnote ,a.date pickdate,a.id pickupid
                                          from tx_pickups a 
                                          left join customers b on a.customers_id=b.id 
                                          left join tx_orders c on a.orders_id=c.id 
@@ -59,8 +59,8 @@ $numdata = mysqli_num_rows($getdata);
                                                 <td><?= $rows['pickupdate']; ?></td>
                                                 <td><?= $rows['pickupnote']; ?></td>
                                                 <td class="text-center" style="width:20%;">
-                                                    <a href="<?= $links_path; ?>&form=edit&tid=<?= base64_encode($rows['id']); ?>" class="btn btn-primary"><i class="bi bi-pencil"></i></a>
-                                                    <a href="#" id="delete_<?= $rows['id']; ?>" tid="<?= $rows['id']; ?>" tipe="tx_pickups" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                                                    <a href="<?= $links_path; ?>&form=edit&tid=<?= base64_encode($rows['pickupid']); ?>" class="btn btn-primary"><i class="bi bi-pencil"></i></a>
+                                                    <a href="#" id="delete_<?= $rows['pickupid']; ?>" tid="<?= $rows['pickupid']; ?>" tipe="tx_pickups" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -77,9 +77,9 @@ $numdata = mysqli_num_rows($getdata);
                 </div><!-- End Top Selling -->
             <?php } else {
                 if (isset($_GET['tid'])) {
+                    $tid = base64_decode($_GET['tid']);
                     $label = 'Edit';
                     $labelbutton = 'Update';
-                    $tid = base64_decode($_GET['tid']);
                     $getdata = mysqli_query($conn, "
                         SELECT c.*,b.name customername,DATE_FORMAT(c.date, '%W , %d %M %Y') dates
                                         ,DATE_FORMAT(a.date, '%W , %d %M %Y') pickupdate
