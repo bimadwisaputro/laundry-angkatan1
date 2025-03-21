@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 $getdata = mysqli_query($conn, "SELECT a.*,case a.status when '1' then 'Puckup Done' else 'Waiting Pickup' end as statuslabel 
                                         ,case a.status when '1' then 'success' else 'danger' end as statuscolor 
                                         ,b.name customername,DATE_FORMAT(a.date, '%W , %d %M %Y') dates
@@ -7,6 +8,12 @@ $getdata = mysqli_query($conn, "SELECT a.*,case a.status when '1' then 'Puckup D
                                          left join customers b on a.customers_id=b.id 
                                          where a.deleted_at is null 
                                          order by a.id desc");
+=======
+$getdata = mysqli_query($conn, "SELECT a.*,case a.status when '1' then 'Puckup Already' else 'Not Pickup' end as statuslabel 
+                                        ,case a.status when '1' then 'success' else 'danger' end as statuscolor 
+                                        ,b.name customername,DATE_FORMAT(a.date, '%W , %d %M %Y') dates,DATE_FORMAT(a.end_date, '%W , %d %M %Y') end_dates 
+                                         from tx_orders a left join customers b on a.customers_id=b.id where a.deleted_at is null order by a.id desc");
+>>>>>>> 73a3255a736110316658f8be2efd3a64d4fde25e
 $numdata = mysqli_num_rows($getdata);
 
 ?>
@@ -64,6 +71,7 @@ $numdata = mysqli_num_rows($getdata);
                                                 </td>
                                                 <td class="text-center" style="width:20%;">
                                                     <a href="<?= $links_path; ?>&form=edit&tid=<?= base64_encode($rows['id']); ?>" class="btn btn-primary"><i class="bi bi-pencil"></i></a>
+<<<<<<< HEAD
                                                     <a href="#" id="delete_<?= $rows['id']; ?>" tid="<?= $rows['id']; ?>" tipe="tx_orders" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                                                     <?php if ($rows['status'] == '0') { ?>
                                                         <a href="#" id="pickups_<?= $rows['id']; ?>"
@@ -79,6 +87,10 @@ $numdata = mysqli_num_rows($getdata);
                                                             total="<?= number_format($rows['total']); ?>"
                                                             tipe="orders" class="btn btn-warning">Pickup</a>
                                                     <?php } ?>
+=======
+                                                    <a href="#" id="delete_<?= $rows['id']; ?>" tid="<?= $rows['id']; ?>" tipe="orders" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                                                    <a href="#" id="pickups_<?= $rows['id']; ?>" tid="<?= $rows['id']; ?>" tipe="orders" class="btn btn-info">Pickup</a>
+>>>>>>> 73a3255a736110316658f8be2efd3a64d4fde25e
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -194,7 +206,11 @@ $numdata = mysqli_num_rows($getdata);
                                         <label for="end_date">Finish Date</label>
                                     </div>
                                 </div>
+<<<<<<< HEAD
                                 <div class="col-md-10 mb-2">
+=======
+                                <div class="col-md-11 mb-2">
+>>>>>>> 73a3255a736110316658f8be2efd3a64d4fde25e
                                     <label for="customers_id">Customers</label>
                                     <select class="select2tags form-control ordersform" name="customers_id" id="customers_id" required>
                                         <option value="">Find Customers</option>
@@ -205,7 +221,11 @@ $numdata = mysqli_num_rows($getdata);
                                         <?php } ?>
                                     </select>
                                 </div>
+<<<<<<< HEAD
                                 <div class="col-md-2 mb-3" style="margin:auto" align="right">
+=======
+                                <div class="col-md-1 mb-3" style="margin:auto">
+>>>>>>> 73a3255a736110316658f8be2efd3a64d4fde25e
                                     <button id="addcustomers" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable"><i class="bi bi-plus"></i> Customers</button>
                                 </div>
                                 <div class="col-md-4 mb-3">
@@ -349,6 +369,7 @@ $numdata = mysqli_num_rows($getdata);
 
 </main><!-- End #main -->
 
+<<<<<<< HEAD
 <div class="modal fade" id="modalDialogPickups" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -392,6 +413,8 @@ $numdata = mysqli_num_rows($getdata);
 
 
 
+=======
+>>>>>>> 73a3255a736110316658f8be2efd3a64d4fde25e
 <div class="modal fade" id="modalDialogScrollable" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
@@ -417,7 +440,11 @@ $numdata = mysqli_num_rows($getdata);
                     <div class="col-md-12 mb-2">
                         <div class="form-floating">
                             <textarea type="text" class="form-control customersform" name="address" id="address" placeholder="Address"></textarea>
+<<<<<<< HEAD
                             <label for="address">Address</label>
+=======
+                            <label for="name">Address</label>
+>>>>>>> 73a3255a736110316658f8be2efd3a64d4fde25e
                         </div>
                     </div>
                     <div class="col-md-12">
