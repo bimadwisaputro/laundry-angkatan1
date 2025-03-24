@@ -32,7 +32,8 @@ if (isset($_GET['page'])) {
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css">
     <!-- css spinner load -->
     <link rel="stylesheet" href="css/loading_spinner.css" type="text/css">
 
@@ -46,7 +47,6 @@ if (isset($_GET['page'])) {
     <link href="assets/adminlte/assets/vendor/quill/quill.snow.css" rel="stylesheet">
     <link href="assets/adminlte/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="assets/adminlte/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="assets/adminlte/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
     <link href="assets/adminlte/assets/css/style.css" rel="stylesheet">.
