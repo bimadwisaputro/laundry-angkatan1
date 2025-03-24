@@ -324,7 +324,8 @@ $rows_top5service = mysqli_fetch_all($getdata_top5service, MYSQLI_ASSOC);
                                     <tr>
                                         <th scope="col">Service</th>
                                         <th scope="col">Price</th>
-                                        <th scope="col">Sold</th>
+                                        <th scope="col">Orders</th>
+                                        <th scope="col">Qty</th>
                                         <th scope="col">Revenue</th>
                                     </tr>
                                 </thead>
@@ -335,7 +336,8 @@ $rows_top5service = mysqli_fetch_all($getdata_top5service, MYSQLI_ASSOC);
                                         <tr>
                                             <td><a href="#" class="text-primary fw-bold"><?= $rowtop5service['name']; ?></a></td>
                                             <td>Rp. <?= number_format($rowtop5service['price']); ?></td>
-                                            <td class="fw-bold"><?= number_format($rowtop5service['totalsell']); ?> Times</td>
+                                            <td class="fw-bold text-center"><?= number_format($rowtop5service['totalsell']); ?></td>
+                                            <td class="fw-bold text-center"><?= number_format($rowtop5service['totalqty']); ?></td>
                                             <td>Rp. <?= number_format($rowtop5service['total']); ?></td>
                                         </tr>
                                     <?php } ?>
